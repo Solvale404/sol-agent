@@ -23,13 +23,10 @@
   <true/>
 
   <key>KeepAlive</key>
-  <dict>
-    <key>SuccessfulExit</key>
-    <false/>
-  </dict>
+  <true/>
 
   <key>ThrottleInterval</key>
-  <integer>10</integer>
+  <integer>5</integer>
 
   <key>StandardOutPath</key>
   <string>/var/jb/var/mobile/SolAgentNext/runtime/stdout.log</string>
@@ -39,8 +36,10 @@
 
   <key>EnvironmentVariables</key>
   <dict>
+    <key>HOME</key>
+    <string>/var/jb/var/mobile</string>
     <key>PATH</key>
-    <string>/var/jb/usr/local/bin:/var/jb/usr/bin:/usr/bin:/bin</string>
+    <string>/var/jb/usr/local/bin:/var/jb/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     <key>PYTHONUNBUFFERED</key>
     <string>1</string>
   </dict>
