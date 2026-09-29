@@ -3,7 +3,10 @@
   "device_name": "Sol",
   "data_dir": "/var/jb/var/mobile/SolAgentNext/runtime",
   "socket_path": "/var/jb/var/mobile/SolAgentNext/runtime/agent.sock",
+  "device_driver": "ios_mcp",
+  "ios_mcp_url": "http://127.0.0.1:8090",
   "mqtt": {
+    "enabled": false,
     "host": "homeassistant.local",
     "port": 1883,
     "client_id": "sol-phone-agent",
