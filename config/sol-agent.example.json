@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "device_name": "Sol",
+  "data_dir": "/var/jb/var/mobile/SolAgentNext/runtime",
+  "socket_path": "/var/jb/var/mobile/SolAgentNext/runtime/agent.sock",
+  "mqtt": {
+    "host": "homeassistant.local",
+    "port": 1883,
+    "client_id": "sol-phone-agent",
+    "username": "REPLACE_ON_DEVICE",
+    "password": "REPLACE_ON_DEVICE",
+    "topic_prefix": "sol/v1",
+    "keepalive": 30,
+    "reconnect_delay": 3
+  },
+  "status_interval": 30,
+  "action_timeout": 8,
+  "rc_path": "auto",
+  "audit_log": true
+}
