@@ -16,7 +16,7 @@ from actions import ActionDispatcher
 from mqtt_client import MQTTClient, MQTTError
 from protocol import ProtocolError, ack, decode_command, dumps, validate_command
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 class CommandStore:
@@ -82,13 +82,16 @@ class SolAgent:
         self.store.prune()
 
         self.dispatcher = ActionDispatcher(
-            config.get("rc_path", "auto"),
-            int(config.get("action_timeout", 8)),
+            rc_path=config.get("rc_path", "auto"),
+            timeout=int(config.get("action_timeout", 8)),
+            driver=config.get("device_driver", "ios_mcp"),
+            ios_mcp_url=config.get("ios_mcp_url", "http://127.0.0.1:8090"),
         )
         self.audit_path = os.path.join(self.data_dir, "audit.jsonl")
         self.audit_enabled = bool(config.get("audit_log", True))
 
         mqtt_cfg = config["mqtt"]
+        self.mqtt_enabled = bool(mqtt_cfg.get("enabled", True))
         self.prefix = mqtt_cfg.get("topic_prefix", "sol/v1").rstrip("/")
         self.cmd_topic = self.prefix + "/cmd"
         self.availability_topic = self.prefix + "/availability"
@@ -117,7 +120,9 @@ class SolAgent:
             "pid": os.getpid(),
             "python": sys.version.split()[0],
             "rootless": os.path.exists("/var/jb"),
-            "rc_available": bool(self.dispatcher.rc_path),
+            "device_driver": self.dispatcher.driver,
+            "device_control_available": self.dispatcher.available(),
+            "mqtt_enabled": self.mqtt_enabled,
             "mqtt_connected": bool(self.mqtt and self.mqtt.connected),
             "last_command_id": self.last_command_id,
             "last_error": self.last_error,
@@ -314,8 +319,12 @@ class SolAgent:
 
     def run(self) -> None:
         threading.Thread(target=self.local_socket_loop, name="sol-local", daemon=True).start()
-        self.audit("agent_started", version=VERSION)
-        self.mqtt_loop()
+        self.audit("agent_started", version=VERSION, device_driver=self.dispatcher.driver, mqtt_enabled=self.mqtt_enabled)
+        if self.mqtt_enabled:
+            self.mqtt_loop()
+        else:
+            while not self.stop_event.wait(1.0):
+                pass
 
     def stop(self) -> None:
         self.stop_event.set()
@@ -336,9 +345,11 @@ def load_config(path: str) -> Dict[str, Any]:
     for key in required:
         if key not in config:
             raise ValueError("missing_config:%s" % key)
-    for key in ("host",):
-        if key not in config["mqtt"]:
-            raise ValueError("missing_mqtt_config:%s" % key)
+    mqtt = config["mqtt"]
+    if not isinstance(mqtt, dict):
+        raise ValueError("mqtt_must_be_object")
+    if bool(mqtt.get("enabled", True)) and not mqtt.get("host"):
+        raise ValueError("missing_mqtt_config:host")
     return config
 
 
