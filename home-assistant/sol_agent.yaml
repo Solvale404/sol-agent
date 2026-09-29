@@ -1,0 +1,104 @@
+# Home Assistant package example for Sol Agent.
+# Requires the MQTT integration/broker to already be configured.
+# Keep this as backend plumbing; build one unified Sol UI card on top of it.
+
+mqtt:
+  sensor:
+    - name: "Sol Agent"
+      unique_id: sol_agent_status
+      state_topic: "sol/v1/availability"
+      json_attributes_topic: "sol/v1/status"
+      icon: mdi:cellphone-cog
+
+    - name: "Sol Agent Capabilities"
+      unique_id: sol_agent_capabilities
+      state_topic: "sol/v1/availability"
+      json_attributes_topic: "sol/v1/capabilities"
+      icon: mdi:format-list-checks
+
+script:
+  sol_agent_command:
+    alias: Sol Agent Command
+    mode: parallel
+    max: 10
+    fields:
+      action:
+        name: Action
+        required: true
+        selector:
+          text:
+      args:
+        name: Arguments
+        required: false
+        default: {}
+        selector:
+          object:
+      ttl:
+        name: TTL seconds
+        required: false
+        default: 30
+        selector:
+          number:
+            min: 1
+            max: 300
+            mode: box
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: sol/v1/cmd
+          retain: false
+          payload: >-
+            {{
+              {
+                "v": 1,
+                "id": "ha-" ~ (as_timestamp(now()) * 1000) | int ~ "-" ~ range(1000, 9999) | random,
+                "action": action,
+                "args": args | default({}, true),
+                "sent_at": as_timestamp(now()),
+                "ttl": ttl | default(30, true) | int,
+                "source": "home-assistant"
+              } | to_json
+            }}
+
+  sol_agent_ping:
+    alias: Sol Agent Ping
+    sequence:
+      - action: script.sol_agent_command
+        data:
+          action: system.ping
+          args: {}
+
+  sol_agent_home:
+    alias: Sol Agent Home Button
+    sequence:
+      - action: script.sol_agent_command
+        data:
+          action: ui.home
+          args: {}
+
+  sol_agent_lock:
+    alias: Sol Agent Lock
+    sequence:
+      - action: script.sol_agent_command
+        data:
+          action: ui.lock
+          args: {}
+
+  sol_agent_toast:
+    alias: Sol Agent Toast
+    fields:
+      title:
+        required: true
+        selector:
+          text:
+      subtitle:
+        required: false
+        selector:
+          text:
+    sequence:
+      - action: script.sol_agent_command
+        data:
+          action: notify.toast
+          args:
+            title: "{{ title }}"
+            subtitle: "{{ subtitle | default('', true) }}"
