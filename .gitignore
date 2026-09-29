@@ -1,0 +1,24 @@
+# Runtime secrets / local config
+config.json
+*.local.json
+.env
+.env.*
+secrets/
+
+# Runtime state
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.jsonl
+*.sock
+runtime/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store
