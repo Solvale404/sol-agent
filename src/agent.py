@@ -39,9 +39,7 @@ class CommandStore:
     def put(self, body: Dict[str, Any]) -> None:
         with self.lock:
             self.db.execute(
-                "INSERT INTO commands(id,action,status,ack_json,updated_at) VALUES(?,?,?,?,?) "
-                "ON CONFLICT(id) DO UPDATE SET action=excluded.action,status=excluded.status,"
-                "ack_json=excluded.ack_json,updated_at=excluded.updated_at",
+                "INSERT OR REPLACE INTO commands(id,action,status,ack_json,updated_at) VALUES(?,?,?,?,?)",
                 (body["id"], body.get("action", "unknown"), body["status"], dumps(body), time.time()),
             )
             self.db.commit()
