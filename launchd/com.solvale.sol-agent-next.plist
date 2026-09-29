@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.solvale.sol-agent-next</string>
+
+  <key>UserName</key>
+  <string>mobile</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/var/jb/usr/bin/python3</string>
+    <string>/var/jb/var/mobile/SolAgentNext/src/agent.py</string>
+    <string>--config</string>
+    <string>/var/jb/var/mobile/SolAgentNext/config.json</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/var/jb/var/mobile/SolAgentNext</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+  <key>StandardOutPath</key>
+  <string>/var/jb/var/mobile/SolAgentNext/runtime/stdout.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/var/jb/var/mobile/SolAgentNext/runtime/stderr.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/var/jb/usr/local/bin:/var/jb/usr/bin:/usr/bin:/bin</string>
+    <key>PYTHONUNBUFFERED</key>
+    <string>1</string>
+  </dict>
+</dict>
+</plist>
