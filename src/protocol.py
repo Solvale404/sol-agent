@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 ID_RE = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 ACTION_RE = re.compile(r"^[a-z][a-z0-9_.-]{1,63}$")
@@ -18,13 +18,13 @@ def decode_command(payload: bytes) -> Dict[str, Any]:
     try:
         obj = json.loads(payload.decode("utf-8"))
     except Exception as exc:
-        raise ProtocolError(f"invalid_json: {exc}")
+        raise ProtocolError("invalid_json: %s" % exc)
     if not isinstance(obj, dict):
         raise ProtocolError("command_must_be_object")
     return obj
 
 
-def validate_command(cmd: Dict[str, Any], now: float | None = None) -> Tuple[Dict[str, Any], bool]:
+def validate_command(cmd: Dict[str, Any], now: Optional[float] = None) -> Tuple[Dict[str, Any], bool]:
     now = time.time() if now is None else now
     if cmd.get("v") != 1:
         raise ProtocolError("unsupported_version")
@@ -66,8 +66,9 @@ def validate_command(cmd: Dict[str, Any], now: float | None = None) -> Tuple[Dic
     return normalized, expired
 
 
-def ack(command_id: str, action: str, status: str, *, result: Any = None, error: str | None = None) -> Dict[str, Any]:
-    body: Dict[str, Any] = {
+def ack(command_id: str, action: str, status: str, *, result: Any = None,
+        error: Optional[str] = None) -> Dict[str, Any]:
+    return {
         "v": 1,
         "id": command_id,
         "status": status,
@@ -76,7 +77,6 @@ def ack(command_id: str, action: str, status: str, *, result: Any = None, error:
         "error": error,
         "finished_at": time.time() if status in FINAL_STATUSES else None,
     }
-    return body
 
 
 def dumps(obj: Any) -> str:
