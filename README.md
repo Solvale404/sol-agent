@@ -1,5 +1,12 @@
 # Sol Agent
 
+> [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Verified status](docs/project-status.md) · [Releases](https://github.com/Solvale404/sol-agent/releases)
+
+**Responsibility:** Sol's self-contained resident iPhone agent and direct Home Assistant control path.
+
+**Interface:** Resident iPhone service and local HA interface; no public hosted dashboard.
+
+
 Resident control plane for **Sol** — a jailbroken iPhone that should keep useful local/home capabilities working without a Mac in the loop.
 
 > Status: **staging / parallel migration**. This repository must not replace the current working Sol stack until the migration gates in `MIGRATION.md` pass.
